@@ -1,10 +1,22 @@
-AddMessage  remind {robert|Name} to {hello|Message}
-AddMessage  {robert|Name} needs to {hello|Message}
-AddMessage  leave a message for {robert|Name} saying {hello|Message}
-ListMessages  there are any messages for {robert|Name}
-ListMessages  {robert|Name} has any messages
-ListMessages  play any messages for {robert|Name}
-ClearMessages  clear messages for {robert|Name}
-ClearMessages  delete messages for {robert|Name}
-ClearMessages  clear the messages
-ClearMessages  clear messages
+RecordScore  record a score
+RecordScore  save a score
+RecordScore  save our score
+RecordScore  remember a score
+RecordScore  write down a score
+RecordScore  save what we scored
+RecordScore  record a score for {hanabi|Game}
+RecordScore  we just scored {twenty five|Score}
+RecordScore  we just scored {twenty five|Score} in {hanabi|Game}
+
+GetScore  {ten|Score}
+GetScore  {fourteen|Score}
+GetScore  {seventeen|Score}
+GetScore  {twenty five|Score}
+
+GetLiteral  {hanabi|Literal}
+GetLiteral  {carcassonne|Literal}
+GetLiteral  {power grid|Literal}
+GetLiteral  {jake rachel and tom|Literal}
+GetLiteral  {tom|Literal}
+GetLiteral  {ryan and tom|Literal}
+GetLiteral  {jake tom luke ryan and dan|Literal}

@@ -1,32 +1,32 @@
 {
 	"intents": [
 		{
-			"intent": "AddMessage",
+			"intent": "RecordScore",
 			"slots": [
 				{
-					"name": "Name",
+					"name": "Game",
 					"type": "LITERAL"
 				},
 				{
-					"name": "Message",
-					"type": "LITERAL"
+					"name": "Score",
+					"type": "NUMBER"
 				}
 			]
 		},
 		{
-			"intent": "ListMessages",
+			"intent": "GetScore",
 			"slots": [
 				{
-					"name": "Name",
-					"type": "LITERAL"
+					"name": "Score",
+					"type": "NUMBER"
 				}
 			]
 		},
 		{
-			"intent": "ClearMessages",
+			"intent": "GetLiteral",
 			"slots": [
 				{
-					"name": "Name",
+					"name": "Literal",
 					"type": "LITERAL"
 				}
 			]
