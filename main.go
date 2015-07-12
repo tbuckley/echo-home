@@ -42,27 +42,27 @@ func (h *EchoRequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetNextQuestion(res *alexa.EchoResponse) (string, bool) {
-	_, ok := res.SessionAttributes["game"]
+func GetNextQuestion(session map[string]interface{}) (string, bool) {
+	_, ok := session["game"]
 	if !ok {
-		return "game", true
+		return "game", false
 	}
 
-	_, ok = res.SessionAttributes["score"]
+	_, ok = session["score"]
 	if !ok {
-		return "score", true
+		return "score", false
 	}
 
-	_, ok = res.SessionAttributes["players"]
+	_, ok = session["players"]
 	if !ok {
-		return "players", true
+		return "players", false
 	}
 
-	return "", false
+	return "", true
 }
 
 func AskNextQuestion(w http.ResponseWriter, req *alexa.EchoRequest, res *alexa.EchoResponse) {
-	prompt, complete := GetNextQuestion(res)
+	prompt, complete := GetNextQuestion(res.SessionAttributes)
 
 	if !complete {
 		for _, prop := range []string{"game", "score", "players"} {
