@@ -42,45 +42,52 @@ func (h *EchoRequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetRemainingValues(w http.ResponseWriter, res *alexa.EchoResponse) {
+func GetNextQuestion(res *alexa.EchoResponse) (string, bool) {
 	_, ok := res.SessionAttributes["game"]
 	if !ok {
-		res.SessionAttributes["prompt"] = "game"
-		res.OutputSpeech("What game did you play?")
-		res.EndSession(false)
-		json, _ := res.ToJSON()
-		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-		w.Write(json)
-		return
+		return "game", true
 	}
 
 	_, ok = res.SessionAttributes["score"]
 	if !ok {
-		res.SessionAttributes["prompt"] = "score"
-		res.OutputSpeech("What score did you get?")
-		res.EndSession(false)
-		json, _ := res.ToJSON()
-		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-		w.Write(json)
-		return
+		return "score", true
 	}
 
 	_, ok = res.SessionAttributes["players"]
 	if !ok {
-		res.SessionAttributes["prompt"] = "players"
-		res.OutputSpeech("Who got that score?")
-		res.EndSession(false)
-		json, _ := res.ToJSON()
-		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-		w.Write(json)
-		return
+		return "players", true
 	}
 
-	res.OutputSpeech("Score recorded!")
-	content := fmt.Sprintf("%v scored %v while playing %v", res.SessionAttributes["players"], res.SessionAttributes["score"], res.SessionAttributes["game"])
-	res.Card("Score recorded", content)
+	return "", false
+}
 
-	res.EndSession(true)
+func AskNextQuestion(w http.ResponseWriter, req *alexa.EchoRequest, res *alexa.EchoResponse) {
+	prompt, complete := GetNextQuestion(res)
+
+	if !complete {
+		for _, prop := range []string{"game", "score", "players"} {
+			val, ok := req.Session.Attributes.String[prop]
+			if !ok {
+				res.SessionAttributes[prop] = val
+			}
+		}
+		res.SessionAttributes["prompt"] = prompt
+		res.EndSession(false)
+		switch {
+		case prompt == "game":
+			res.OutputSpeech("What game did you play?")
+		case prompt == "score":
+			res.OutputSpeech("What score did you get?")
+		case prompt == "score":
+			res.OutputSpeech("Who got that score?")
+		}
+	} else {
+		res.OutputSpeech("Score recorded!")
+		content := fmt.Sprintf("%v scored %v while playing %v", res.SessionAttributes["players"], res.SessionAttributes["score"], res.SessionAttributes["game"])
+		res.Card("Score recorded", content)
+		res.EndSession(true)
+	}
+
 	json, _ := res.ToJSON()
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Write(json)
@@ -100,7 +107,7 @@ func RecordScoreHandler(w http.ResponseWriter, r *http.Request) {
 		res.SessionAttributes["score"] = score
 	}
 
-	GetRemainingValues(w, res)
+	AskNextQuestion(w, req, res)
 }
 
 func GetScoreHandler(w http.ResponseWriter, r *http.Request) {
@@ -108,36 +115,37 @@ func GetScoreHandler(w http.ResponseWriter, r *http.Request) {
 	res := alexa.NewResponse()
 
 	prompt, ok := req.Session.Attributes.String["prompt"]
-	score, err := req.GetSlotValue("Score")
-	if err != nil || !ok || prompt != "score" {
-		res.OutputSpeech("What score did you get?")
-		res.EndSession(false)
+	if !ok || prompt != "score" {
+		res.OutputSpeech("That's not what I was expecting")
+		res.EndSession(true)
 		json, _ := res.ToJSON()
 		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 		w.Write(json)
 		return
 	}
 
-	for _, prop := range []string{"game", "score", "players"} {
-		val, ok := req.Session.Attributes.String[prop]
-		if !ok {
-			res.SessionAttributes[prop] = val
-		}
-	}
-
+	score, _ := req.GetSlotValue("Score")
 	res.SessionAttributes["score"] = score
 
-	GetRemainingValues(w, res)
+	AskNextQuestion(w, req, res)
 }
 
 func GetLiteralHandler(w http.ResponseWriter, r *http.Request) {
 	req := alexa.GetEchoRequest(r)
 	res := alexa.NewResponse()
 
-	literal, _ := req.GetSlotValue("Literal")
-	prompt, _ := req.Session.Attributes.String["prompt"].(string)
+	prompt, ok := req.Session.Attributes.String["prompt"].(string)
+	if !ok {
+		res.OutputSpeech("That's not what I was expecting")
+		res.EndSession(true)
+		json, _ := res.ToJSON()
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		w.Write(json)
+		return
+	}
 
+	literal, _ := req.GetSlotValue("Literal")
 	res.SessionAttributes[prompt] = literal
 
-	GetRemainingValues(w, res)
+	AskNextQuestion(w, req, res)
 }
