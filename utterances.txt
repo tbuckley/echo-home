@@ -1,0 +1,10 @@
+AddMessage  remind {robert|Name} to {hello|Message}
+AddMessage  {robert|Name} needs to {hello|Message}
+AddMessage  leave a message for {robert|Name} saying {hello|Message}
+ListMessages  there are any messages for {robert|Name}
+ListMessages  {robert|Name} has any messages
+ListMessages  play any messages for {robert|Name}
+ClearMessages  clear messages for {robert|Name}
+ClearMessages  delete messages for {robert|Name}
+ClearMessages  clear the messages
+ClearMessages  clear messages

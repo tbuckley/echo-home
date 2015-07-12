@@ -1,0 +1,35 @@
+{
+	"intents": [
+		{
+			"intent": "AddMessage",
+			"slots": [
+				{
+					"name": "Name",
+					"type": "LITERAL"
+				},
+				{
+					"name": "Message",
+					"type": "LITERAL"
+				}
+			]
+		},
+		{
+			"intent": "ListMessages",
+			"slots": [
+				{
+					"name": "Name",
+					"type": "LITERAL"
+				}
+			]
+		},
+		{
+			"intent": "ClearMessages",
+			"slots": [
+				{
+					"name": "Name",
+					"type": "LITERAL"
+				}
+			]
+		}
+	]
+}
